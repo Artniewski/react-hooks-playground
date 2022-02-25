@@ -1,4 +1,4 @@
-import React, {useCallback, useReducer, useState} from 'react';
+import React, {useCallback, useReducer} from 'react';
 
 import IngredientForm from './IngredientForm';
 import Search from './Search';
@@ -36,17 +36,11 @@ const httpReducer = (currentHttpState, action) => {
 function Ingredients() {
     const [httpState, dispatchHttp] = useReducer(httpReducer, {loading: false, error: null})
     const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
-    //const [userIngredients, setUserIngredients] = useState([]);
-    // const [isLoading, setIsLoading] = useState(false);
-    // const [error, setError] = useState();
-
     const filteredIngredientsHandler = useCallback(filteredIngredients => {
-        //setUserIngredients(filteredIngredients)
         dispatch({type: 'SET', ingredients: filteredIngredients});
     }, []);
 
     const addIngredientHandler = async ingredient => {
-        // setIsLoading(true);
         dispatchHttp({type: 'SEND'});
         try {
             const response = await fetch(
@@ -57,22 +51,14 @@ function Ingredients() {
                     headers: {'Content-Type': 'application/json'}
                 });
             const responseData = await response.json();
-            // setIsLoading(false);
-            // setUserIngredients(prevIngredients => [
-            //     ...prevIngredients,
-            //     {id: responseData.name, ...ingredient}
-            // ]);
             dispatchHttp({type: 'RESPONSE'})
             dispatch({type: 'ADD', ingredient: {id: responseData.name, ...ingredient}});
         } catch (error) {
-            // setError('Something went wrong');
-            // setIsLoading(false);
             dispatchHttp({type: 'ERROR', error: error.message});
         }
     };
 
     const removeIngredientHandler = async ingredientId => {
-        //setIsLoading(true);
         dispatchHttp({type: 'SEND'});
         try {
             await fetch(
@@ -80,22 +66,15 @@ function Ingredients() {
                 {
                     method: 'DELETE',
                 });
-            // setIsLoading(false);
-            // setUserIngredients(prevIngredients => {
-            //     return prevIngredients.filter(ingredient => ingredient.id !== ingredientId);
-            // })
             dispatchHttp({type: 'RESPONSE'})
             dispatch({type: 'DELETE', id: ingredientId});
         } catch (error) {
-            // setError('Something went wrong');
-            // setIsLoading(false);
             dispatchHttp({type: 'ERROR', error: error.message});
 
         }
     }
 
     const clearError = () => {
-        // setError(null);
         dispatchHttp({type: 'CLEAR'})
     }
 
